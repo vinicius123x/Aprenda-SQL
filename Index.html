@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprenda SQL</title>
+     <link rel="icon" href="Icone.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            
+            --primary: #3b82f6;        
+            --primary-hover: #60a5fa;  
+            --text-main: #f8fafc;      
+            --text-muted: #cbd5e1;     
+            --success: #10b981;        
+            --danger: #ef4444;         
+            --warning: #f59e0b;
+            
+            --sql-keyword: #c678dd; 
+            --sql-func: #61afef;    
+            --sql-num: #d19a66;     
+            --sql-str: #98c379;     
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { 
+            background: var(--bg-gradient); 
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-main); 
+            display: flex; flex-direction: column; 
+            min-height: 100vh; font-size: 18px; line-height: 1.6; 
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        header { 
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            color: var(--primary-hover); padding: 1.5rem 2rem; text-align: center; 
+            border-bottom: 1px solid var(--glass-border); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); 
+            position: sticky; top: 0; z-index: 50;
+        }
+        
+        header h1 { font-size: 2.2rem; text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+
+        .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 2rem; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+        .screen { display: none; width: 100%; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .screen.active { display: block; }
+        
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass-panel {
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--glass-shadow); padding: 2.5rem;
+        }
+
+        #intro-screen { text-align: center; margin-top: 2vh; }
+        #intro-screen h1 { font-size: 3rem; margin-bottom: 0.5rem; }
+        #intro-screen h2 { font-size: 1.8rem; color: var(--primary-hover); margin-bottom: 2rem; }
+        .team-box { margin-bottom: 2.5rem; transition: transform 0.3s; }
+        .team-box:hover { transform: translateY(-5px); border-color: rgba(59,130,246,0.3); }
+        
+        .arrow-btn { 
+            background: linear-gradient(135deg, var(--primary), #2563eb); color: white; border: none; padding: 18px 40px; font-size: 1.5rem; 
+            border-radius: 50px; cursor: pointer; transition: all 0.3s ease; font-weight: bold; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); 
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .arrow-btn:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6); }
+
+        #menu-screen { margin-top: 2vh; }
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; width: 100%; margin-bottom: 2rem;}
+        .menu-card { 
+            background: var(--glass-bg); backdrop-filter: blur(8px); border-radius: 16px; padding: 2rem 1rem; text-align: center; cursor: pointer; 
+            border: 1px solid var(--glass-border); border-left: 6px solid var(--primary); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            font-weight: bold; font-size: 1.4rem; color: var(--text-main); 
+        }
+        .menu-card i { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-hover); transition: 0.3s;}
+        .menu-card:hover { transform: translateY(-10px); background: rgba(59, 130, 246, 0.15); border-left-color: var(--primary-hover); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
+        .menu-card:hover i { transform: scale(1.2); color: white; }
+
+        .lesson-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1.5rem; }
+        .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; flex-wrap: wrap; }
+        .tab-btn { 
+            background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 12px 20px; color: var(--text-muted); font-weight: bold; 
+            transition: all 0.3s; border-radius: 8px 8px 0 0; position: relative;
+        }
+        .tab-btn:hover { color: white; }
+        .tab-btn.active { color: var(--primary-hover); background: rgba(59, 130, 246, 0.1); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -11px; left: 0; width: 100%; height: 3px; background: var(--primary-hover); box-shadow: 0 0 10px var(--primary-hover); }
+        
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+        .tab-content h3 { color: var(--primary-hover); margin-top: 1.5rem; margin-bottom: 0.8rem; font-size: 1.4rem; display: flex; align-items: center; gap: 10px;}
+        .tab-content p { margin-bottom: 1rem; font-size: 1.15rem; }
+        .tab-content ul { margin-left: 2rem; margin-bottom: 1rem; font-size: 1.15rem; }
+        
+        .highlight-box { background: rgba(59, 130, 246, 0.1); border-left: 4px solid var(--primary); padding: 15px 20px; border-radius: 8px; margin: 1.5rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .highlight-box.warning { background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--warning); }
+        .highlight-box.success { background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success); }
+
+        pre { 
+            background: rgba(0, 0, 0, 0.4); color: #e6edf3; padding: 1.5rem; border-radius: 12px; overflow-x: auto; 
+            font-family: 'Courier New', monospace; margin: 1.5rem 0; border: 1px solid #334155; font-size: 1.2rem; font-weight: bold; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .hl-keyword { color: var(--sql-keyword); text-shadow: 0 0 5px rgba(198, 120, 221, 0.3);}
+        .hl-func { color: var(--sql-func); text-shadow: 0 0 5px rgba(97, 175, 239, 0.3);}
+        .hl-num { color: var(--sql-num); }
+        .hl-str { color: var(--sql-str); }
+
+        /* Quiz */
+        .question-text { font-size: 1.5rem; margin-bottom: 1.5rem; color: #fff; font-weight: bold; border-left: 4px solid var(--warning); padding-left: 15px;}
+        .drop-zone, .block-bank { 
+            min-height: 100px; background: rgba(0,0,0,0.3); border: 2px dashed #475569; border-radius: 12px; padding: 20px; 
+            display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; transition: all 0.3s;
+        }
+        .drop-zone.drag-over { background: rgba(59, 130, 246, 0.15); border-color: var(--primary-hover); box-shadow: inset 0 0 15px rgba(59, 130, 246, 0.3); }
+        .block-bank.drag-over { background: rgba(255, 255, 255, 0.05); border-color: #94a3b8; }
+        
+        .sql-block { 
+            background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(4px); color: var(--text-main); padding: 12px 22px; border-radius: 8px; 
+            cursor: grab; user-select: none; font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: bold; border: 1px solid var(--glass-border); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s, box-shadow 0.2s; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .sql-block.k-keyword { border-bottom: 3px solid var(--sql-keyword); }
+        .sql-block.k-func { border-bottom: 3px solid var(--sql-func); }
+        .sql-block.k-num { border-bottom: 3px solid var(--sql-num); }
+        .sql-block.k-str { border-bottom: 3px solid var(--sql-str); }
+        .sql-block.k-default { border-bottom: 3px solid #94a3b8; }
+        .sql-block:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
+        .sql-block:active, .sql-block.dragging { cursor: grabbing; opacity: 0.7; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10;}
+        
+        .btn-action { 
+            background: rgba(59, 130, 246, 0.8); backdrop-filter: blur(4px); color: white; border: 1px solid rgba(255,255,255,0.1); 
+            padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1rem; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .btn-action:hover { background: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4); }
+        .btn-secondary { background: rgba(71, 85, 105, 0.6); }
+        .btn-secondary:hover { background: rgba(71, 85, 105, 0.9); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+        .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; border: none; }
+        .btn-warning:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+        
+        .feedback { margin-top: 1.5rem; font-weight: bold; font-size: 1.2rem; padding: 20px; border-radius: 12px; display: none; animation: fadeIn 0.5s; backdrop-filter: blur(5px);}
+        .feedback.success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .feedback.error { background: rgba(239, 68, 68, 0.1); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .feedback.info { background: rgba(59, 130, 246, 0.1); color: var(--primary-hover); border: 1px solid rgba(59, 130, 246, 0.3); }
+
+        /* TABELA DE RESULTADOS SEM CORTE (SEM max-height) */
+        .result-table-container { 
+            margin-top: 1.5rem; margin-bottom: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 8px; 
+            border: 1px solid #334155; 
+            overflow: hidden; 
+        }
+        .result-table-container h4 { background: rgba(255,255,255,0.05); padding: 12px; font-size: 1rem; color: var(--text-muted); text-align: center; border-bottom: 1px solid #334155; margin: 0;}
+        .result-table { width: 100%; border-collapse: collapse; font-size: 1rem; color: #fff; }
+        .result-table th, .result-table td { padding: 10px 15px; border-bottom: 1px solid #1e293b; text-align: left; }
+        .result-table th { background: rgba(59, 130, 246, 0.2); color: var(--primary-hover); }
+        .result-table tr:hover { background: rgba(255,255,255,0.03); }
+
+        .db-btn { 
+            position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, var(--primary), #2563eb); color: white; border: none; border-radius: 50%; width: 70px; height: 70px; font-size: 1.8rem; 
+            cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; transition: 0.3s; z-index: 100;
+        }
+        .db-btn:hover { transform: scale(1.1) rotate(15deg); box-shadow: 0 15px 35px rgba(59,130,246,0.6); }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; animation: fadeIn 0.3s;}
+        .modal-content { background: var(--bg-gradient); padding: 2.5rem; border-radius: 16px; border: 1px solid var(--glass-border); width: 100%; max-width: 1200px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
+        .close-modal { float: right; cursor: pointer; font-size: 2.5rem; color: var(--danger); transition: 0.2s; line-height: 1; text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);}
+        .close-modal:hover { transform: scale(1.2) rotate(90deg); }
+        
+        .data-table-container { margin-bottom: 2.5rem; border: 1px solid #334155; border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3); }
+        
+        .stats-box { text-align: center; }
+        .summary-list { margin: 2rem 0; text-align: left; background: rgba(0,0,0,0.3); padding: 2rem; border-radius: 12px; border: 1px solid var(--glass-border); max-height: 300px; overflow-y: auto;}
+        .summary-item { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 1.1rem; display: flex; align-items: center; gap: 15px;}
+        .summary-item.right { border-left: 4px solid var(--success); }
+        .summary-item.wrong { border-left: 4px solid var(--danger); }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+        .shake-animation { animation: shake 0.4s ease-in-out; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><i class="fas fa-database"></i> Aprenda SQL Interativamente</h1>
+    </header>
+
+    <div class="container">
+        <div id="intro-screen" class="screen active">
+            <h1 style="text-shadow: 0 0 15px rgba(255,255,255,0.2);">Instituto Federal da Paraíba</h1>
+            <h2><i class="fas fa-map-marker-alt"></i> Campus Picuí</h2>
+            <div class="glass-panel team-box">
+                <h3 style="color: var(--primary-hover); margin-bottom: 1.5rem; font-size: 1.8rem;"><i class="fas fa-code"></i> Desenvolvido por:</h3>
+                <p><i class="fas fa-user-graduate"></i> Vinicius de Araujo Dantas</p>
+                <p><i class="fas fa-user-graduate"></i> Felipe Gabriel Oliveira Pereira</p>
+                <hr style="border-color: var(--glass-border); margin: 1.5rem 0;">
+                <p style="color: var(--text-muted);"><i class="fas fa-chalkboard-teacher"></i> Orientador:</p>
+                <p style="font-weight: bold; font-size: 1.5rem; margin-top: 5px;">Prof. André Luiz Firmino Alves</p>
+            </div>
+            <p style="margin-bottom: 2rem; font-size: 1.3rem;">Domine comandos SQL montando blocos visuais.<br>Usaremos o banco de dados oficial da Biblioteca Escolar para os testes e resultados reais.</p>
+            <button class="arrow-btn" onclick="showScreen('menu-screen')">Avançar para o Menu <i class="fas fa-arrow-right"></i></button>
+        </div>
+
+        <div id="menu-screen" class="screen">
+            <h2 style="margin-bottom: 2.5rem; text-align: center; font-size: 2.2rem; text-shadow: 0 0 10px rgba(255,255,255,0.2);"><i class="fas fa-layer-group"></i> Selecione o Comando</h2>
+            <div class="grid-menu">
+                <div class="menu-card" onclick="loadLesson('top')"><i class="fas fa-sort-amount-up"></i><br>SELECT TOP / LIMIT</div>
+                <div class="menu-card" onclick="loadLesson('groupby')"><i class="fas fa-object-group"></i><br>GROUP BY & HAVING</div>
+                <div class="menu-card" onclick="loadLesson('union')"><i class="fas fa-link"></i><br>UNION</div>
+                <div class="menu-card" onclick="loadLesson('exists')"><i class="fas fa-check-circle"></i><br>EXISTS</div>
+                <div class="menu-card" onclick="loadLesson('any')"><i class="fas fa-random"></i><br>ANY</div>
+            </div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn-action btn-secondary" onclick="showScreen('intro-screen')"><i class="fas fa-arrow-left"></i> Voltar</button>
+            </div>
+        </div>
+
+        <div id="lesson-screen" class="screen">
+            <div class="lesson-header">
+                <h2 id="lesson-title" style="color: var(--primary-hover); font-size: 2.5rem; text-shadow: 0 0 10px rgba(59,130,246,0.4);">Comando</h2>
+                <button class="btn-action btn-secondary" onclick="showScreen('menu-screen')"><i class="fas fa-home"></i> Menu</button>
+            </div>
+
+            <div class="tabs" id="lesson-tabs">
+                <button class="tab-btn active" data-target="tab-explicacao" onclick="switchTab('explicacao')"><i class="fas fa-book-open"></i> Explicação</button>
+                <button class="tab-btn" data-target="tab-sintaxe" onclick="switchTab('sintaxe')"><i class="fas fa-code"></i> Sintaxe & Regras</button>
+                <button class="tab-btn" data-target="tab-exemplos" onclick="switchTab('exemplos')"><i class="fas fa-lightbulb"></i> Exemplos c/ Resultados</button>
+                <button class="tab-btn" data-target="tab-quiz" onclick="switchTab('quiz')"><i class="fas fa-gamepad"></i> Praticar (Quiz)</button>
+            </div>
+
+            <div id="tab-explicacao" class="glass-panel tab-content active code-area"></div>
+            <div id="tab-sintaxe" class="glass-panel tab-content code-area"></div>
+            <div id="tab-exemplos" class="glass-panel tab-content code-area"></div>
+            
+            <div id="tab-quiz" class="glass-panel tab-content">
+                <div id="quiz-area">
+                    <p id="quiz-progress" style="color: var(--primary-hover); margin-bottom: 15px; font-size: 1.2rem; font-weight: bold;"><i class="fas fa-flag"></i> Pergunta 1 de 5</p>
+                    <div id="quiz-question" class="question-text"></div>
+                    
+                    <p style="font-size: 1.1rem; margin-bottom: 10px; color: var(--text-muted);"><i class="fas fa-mouse-pointer"></i> <b>Sua Consulta:</b> Arraste os blocos aqui ou clique neles.</p>
+                    <div id="quiz-answer-zone" class="drop-zone"></div>
+                    
+                    <p style="font-size: 1.1rem; margin-bottom: 10px; color: var(--text-muted);"><i class="fas fa-cubes"></i> <b>Blocos Disponíveis</b> <span style="color: var(--warning); font-size: 0.95rem;">(Contém blocos falsos!)</span>:</p>
+                    <div id="quiz-block-bank" class="block-bank"></div>
+                    
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 10px; margin-top: 20px;">
+                        <button class="btn-action" id="btn-check" onclick="checkAnswer()"><i class="fas fa-play"></i> Executar Consulta</button>
+                        <button class="btn-action btn-secondary" id="btn-show-answer" onclick="showAnswer()"><i class="fas fa-eye"></i> Não sei, Ver Resposta</button>
+                        <button class="btn-action btn-warning" id="btn-next-q" style="display: none;" onclick="nextQuestion()">Próxima Pergunta <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                    
+                    <div id="quiz-feedback" class="feedback"></div>
+                </div>
+                
+                <div id="quiz-stats" class="stats-box" style="display: none;">
+                    <h2 style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary-hover);"><i class="fas fa-trophy" style="color: gold;"></i> Quiz Concluído!</h2>
+                    <p style="font-size: 1.2rem;">Veja seu desempenho no comando <b id="stat-cmd-name"></b>:</p>
+                    
+                    <div class="summary-list" id="summary-list-container"></div>
+
+                    <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 2rem; font-size: 1.4rem;">
+                        <p><i class="fas fa-check-circle" style="color: var(--success);"></i> Acertos de Primeira: <span id="stat-acertos" style="color: var(--success); font-weight: bold;">0</span></p>
+                        <p><i class="fas fa-times-circle" style="color: var(--danger);"></i> Respostas Exibidas: <span id="stat-erros" style="color: var(--danger); font-weight: bold;">0</span></p>
+                    </div>
+                    
+                    <button class="btn-action" onclick="loadLesson(currentLesson)"><i class="fas fa-redo"></i> Refazer Quiz</button>
+                    <button class="btn-action btn-secondary" onclick="showScreen('menu-screen')"><i class="fas fa-home"></i> Voltar ao Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="db-btn" title="Ver Banco de Dados Completo" onclick="document.getElementById('db-modal').style.display='flex'"><i class="fas fa-database"></i></button>
+
+    <div id="db-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="document.getElementById('db-modal').style.display='none'"><i class="fas fa-times-circle"></i></span>
+            <h2 style="margin-bottom: 0.5rem; color: var(--primary-hover); font-size: 2.2rem;"><i class="fas fa-server"></i> BibliotecaEscolar DB</h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem; color: var(--text-muted);">Consulte as tabelas e dados reais. Role a página do modal para ver todas as informações.</p>
+
+            <h3><i class="fas fa-table"></i> 1. Categorias</h3>
+            <div class="data-table-container">
+                <table class="result-table">
+                    <tr><th>IDCategoria (PK)</th><th>NomeCategoria</th></tr>
+                    <tr><td>1</td><td>Literatura</td></tr><tr><td>2</td><td>Tecnologia</td></tr><tr><td>3</td><td>História</td></tr><tr><td>4</td><td>Ciências</td></tr>
+                    <tr><td>5</td><td>Matemática</td></tr><tr><td>6</td><td>Geografia</td></tr><tr><td>7</td><td>Filosofia</td></tr><tr><td>8</td><td>Biografias</td></tr>
+                </table>
+            </div>
+
+            <h3><i class="fas fa-table"></i> 2. Alunos</h3>
+            <div class="data-table-container">
+                <table class="result-table">
+                    <tr><th>IDAluno (PK)</th><th>NomeAluno</th><th>Turma</th><th>Cidade</th></tr>
+                    <tr><td>1</td><td>Ana Beatriz</td><td>1A</td><td>Guarabira</td></tr><tr><td>2</td><td>João Pedro</td><td>1B</td><td>Cuité</td></tr>
+                    <tr><td>3</td><td>Maria Clara</td><td>2A</td><td>Guarabira</td></tr><tr><td>4</td><td>Lucas Silva</td><td>2B</td><td>Picuí</td></tr>
+                    <tr><td>5</td><td>Pedro Henrique</td><td>2A</td><td>Picuí</td></tr><tr><td>6</td><td>Juliana Souza</td><td>2A</td><td>Nova Floresta</td></tr>
+                    <tr><td>7</td><td>Gabriel Alves</td><td>2B</td><td>Cuité</td></tr><tr><td>8</td><td>Amanda Lima</td><td>2B</td><td>Picuí</td></tr>
+                    <tr><td>9</td><td>Carlos Eduardo</td><td>3A</td><td>Barra de Santa Rosa</td></tr><tr><td>10</td><td>Fernanda Gomes</td><td>3A</td><td>Picuí</td></tr>
+                    <tr><td>11</td><td>José Roberto</td><td>3B</td><td>Nova Floresta</td></tr><tr><td>12</td><td>Bianca Martins</td><td>3B</td><td>Cuité</td></tr>
+                    <tr><td>13</td><td>Marcos Vinícius</td><td>1A</td><td>Picuí</td></tr><tr><td>14</td><td>Larissa Melo</td><td>1A</td><td>Nova Floresta</td></tr>
+                    <tr><td>15</td><td>Rafael Oliveira</td><td>1B</td><td>Cuité</td></tr><tr><td>16</td><td>Vitória Santos</td><td>1B</td><td>Picuí</td></tr>
+                    <tr><td>17</td><td>Mateus Pereira</td><td>2A</td><td>Barra de Santa Rosa</td></tr><tr><td>18</td><td>Camila Ferreira</td><td>2B</td><td>Picuí</td></tr>
+                    <tr><td>19</td><td>Eduarda Costa</td><td>3A</td><td>Cuité</td></tr><tr><td>20</td><td>Leonardo Barbosa</td><td>3B</td><td>Nova Floresta</td></tr>
+                </table>
+            </div>
+
+            <h3><i class="fas fa-table"></i> 3. Livros</h3>
+            <div class="data-table-container">
+                <table class="result-table">
+                    <tr><th>IDLivro (PK)</th><th>Titulo</th><th>IDCategoria (FK)</th><th>AnoPublicacao</th></tr>
+                    <tr><td>101</td><td>Dom Casmurro</td><td>1</td><td>1899</td></tr><tr><td>102</td><td>O Cortiço</td><td>1</td><td>1890</td></tr>
+                    <tr><td>103</td><td>Banco de Dados Básico</td><td>2</td><td>2022</td></tr><tr><td>104</td><td>Algoritmos em Python</td><td>2</td><td>2023</td></tr>
+                    <tr><td>105</td><td>História da Paraíba</td><td>3</td><td>2018</td></tr><tr><td>106</td><td>Introdução à Programação</td><td>2</td><td>2021</td></tr>
+                    <tr><td>107</td><td>Redes de Computadores</td><td>2</td><td>2020</td></tr><tr><td>108</td><td>Inteligência Artificial</td><td>2</td><td>2024</td></tr>
+                    <tr><td>109</td><td>Matemática Básica</td><td>5</td><td>2019</td></tr><tr><td>110</td><td>Álgebra Linear</td><td>5</td><td>2022</td></tr>
+                    <tr><td>111</td><td>Geometria Plana</td><td>5</td><td>2018</td></tr><tr><td>112</td><td>Física para Iniciantes</td><td>4</td><td>2017</td></tr>
+                    <tr><td>113</td><td>Química Geral</td><td>4</td><td>2020</td></tr><tr><td>114</td><td>Biologia Moderna</td><td>4</td><td>2023</td></tr>
+                    <tr><td>115</td><td>Geografia do Brasil</td><td>6</td><td>2016</td></tr><tr><td>116</td><td>Atlas Mundial</td><td>6</td><td>2021</td></tr>
+                    <tr><td>117</td><td>Cartografia Básica</td><td>6</td><td>2019</td></tr><tr><td>118</td><td>Introdução à Filosofia</td><td>7</td><td>2015</td></tr>
+                    <tr><td>119</td><td>Ética e Sociedade</td><td>7</td><td>2018</td></tr><tr><td>120</td><td>Pensadores Modernos</td><td>7</td><td>2022</td></tr>
+                    <tr><td>121</td><td>Steve Jobs</td><td>8</td><td>2014</td></tr><tr><td>122</td><td>Nelson Mandela</td><td>8</td><td>2017</td></tr>
+                    <tr><td>123</td><td>Marie Curie</td><td>8</td><td>2020</td></tr><tr><td>124</td><td>Memórias Póstumas de Brás Cubas</td><td>1</td><td>1881</td></tr>
+                    <tr><td>125</td><td>Vidas Secas</td><td>1</td><td>1938</td></tr><tr><td>126</td><td>Capitães da Areia</td><td>1</td><td>1937</td></tr>
+                    <tr><td>127</td><td>Brasil República</td><td>3</td><td>2012</td></tr><tr><td>128</td><td>História Geral</td><td>3</td><td>2019</td></tr>
+                    <tr><td>129</td><td>Segunda Guerra Mundial</td><td>3</td><td>2018</td></tr><tr><td>130</td><td>História da América Latina</td><td>3</td><td>2021</td></tr>
+                </table>
+            </div>
+
+            <h3><i class="fas fa-table"></i> 4. Emprestimos</h3>
+            <div class="data-table-container">
+                <table class="result-table">
+                    <tr><th>IDEmprestimo (PK)</th><th>IDAluno (FK)</th><th>DataEmprestimo</th></tr>
+                    <tr><td>5001</td><td>1</td><td>2026-05-10</td></tr><tr><td>5002</td><td>2</td><td>2026-05-11</td></tr>
+                    <tr><td>5003</td><td>1</td><td>2026-05-15</td></tr><tr><td>5004</td><td>3</td><td>2026-05-18</td></tr>
+                    <tr><td>5005</td><td>5</td><td>2026-05-20</td></tr><tr><td>5006</td><td>6</td><td>2026-05-21</td></tr>
+                    <tr><td>5007</td><td>7</td><td>2026-05-22</td></tr><tr><td>5008</td><td>8</td><td>2026-05-22</td></tr>
+                    <tr><td>5009</td><td>9</td><td>2026-05-23</td></tr><tr><td>5010</td><td>10</td><td>2026-05-24</td></tr>
+                    <tr><td>5011</td><td>11</td><td>2026-05-25</td></tr><tr><td>5012</td><td>12</td><td>2026-05-26</td></tr>
+                    <tr><td>5013</td><td>13</td><td>2026-05-27</td></tr><tr><td>5014</td><td>14</td><td>2026-05-28</td></tr>
+                    <tr><td>5015</td><td>15</td><td>2026-05-29</td></tr><tr><td>5016</td><td>16</td><td>2026-05-30</td></tr>
+                    <tr><td>5017</td><td>17</td><td>2026-06-01</td></tr><tr><td>5018</td><td>18</td><td>2026-06-02</td></tr>
+                    <tr><td>5019</td><td>19</td><td>2026-06-03</td></tr><tr><td>5020</td><td>20</td><td>2026-06-04</td></tr>
+                </table>
+            </div>
+
+            <h3><i class="fas fa-table"></i> 5. ItensEmprestimo</h3>
+            <div class="data-table-container">
+                <table class="result-table">
+                    <tr><th>IDEmprestimo (FK/PK)</th><th>IDLivro (FK/PK)</th><th>Quantidade</th></tr>
+                    <tr><td>5001</td><td>101</td><td>1</td></tr><tr><td>5001</td><td>103</td><td>1</td></tr>
+                    <tr><td>5002</td><td>104</td><td>1</td></tr><tr><td>5003</td><td>102</td><td>1</td></tr>
+                    <tr><td>5004</td><td>105</td><td>1</td></tr><tr><td>5005</td><td>106</td><td>1</td></tr>
+                    <tr><td>5005</td><td>107</td><td>1</td></tr><tr><td>5006</td><td>109</td><td>1</td></tr>
+                    <tr><td>5006</td><td>110</td><td>1</td></tr><tr><td>5007</td><td>112</td><td>1</td></tr>
+                    <tr><td>5007</td><td>114</td><td>1</td></tr><tr><td>5008</td><td>115</td><td>1</td></tr>
+                    <tr><td>5008</td><td>116</td><td>1</td></tr><tr><td>5009</td><td>118</td><td>1</td></tr>
+                    <tr><td>5009</td><td>120</td><td>1</td></tr><tr><td>5010</td><td>121</td><td>1</td></tr>
+                    <tr><td>5010</td><td>123</td><td>1</td></tr><tr><td>5011</td><td>124</td><td>1</td></tr>
+                    <tr><td>5011</td><td>125</td><td>1</td></tr><tr><td>5012</td><td>127</td><td>1</td></tr>
+                    <tr><td>5012</td><td>129</td><td>1</td></tr><tr><td>5013</td><td>108</td><td>1</td></tr>
+                    <tr><td>5014</td><td>111</td><td>1</td></tr><tr><td>5014</td><td>119</td><td>1</td></tr>
+                    <tr><td>5015</td><td>113</td><td>1</td></tr><tr><td>5016</td><td>122</td><td>1</td></tr>
+                    <tr><td>5016</td><td>130</td><td>1</td></tr><tr><td>5017</td><td>103</td><td>1</td></tr>
+                    <tr><td>5017</td><td>104</td><td>1</td></tr><tr><td>5018</td><td>105</td><td>1</td></tr>
+                    <tr><td>5018</td><td>128</td><td>1</td></tr><tr><td>5019</td><td>126</td><td>1</td></tr>
+                    <tr><td>5019</td><td>117</td><td>1</td></tr><tr><td>5020</td><td>106</td><td>1</td></tr>
+                    <tr><td>5020</td><td>109</td><td>1</td></tr><tr><td>5020</td><td>121</td><td>1</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================================
+        // DADOS DO QUIZ COM EXPLICAÇÕES, SINTAXE E EXEMPLOS VISUAIS!
+        // =====================================================================
+        const lessonsData = {
+            top: {
+                title: "SELECT TOP e LIMIT",
+                explicacao: `
+                    <h3><i class='fas fa-info-circle'></i> O que é o SELECT TOP / LIMIT?</h3>
+                    <p>Imagine que o banco de dados de uma grande biblioteca possui registros de <b>milhões</b> de livros. Se você tentar buscar todos de uma vez, o computador vai demorar minutos para carregar tudo, travando o sistema.</p>
+                    <p>O <strong>SELECT TOP</strong> (usado no SQL Server/Access) e o <strong>LIMIT</strong> (usado no MySQL/PostgreSQL) dizem ao banco de dados: <i>"Traga apenas as primeiras N linhas e ignore o resto"</i>.</p>
+                `,
+                sintaxe: `
+                    <h3><i class='fas fa-terminal'></i> Sintaxe Básica (TOP vs LIMIT):</h3>
+                    <p style="margin-bottom: 10px; color: var(--text-muted);">No <b>SQL Server</b>, o TOP fica logo após o SELECT:</p>
+                    <pre>SELECT TOP numero coluna1 \nFROM tabela;</pre>
+                    
+                    <p style="margin-top: 15px; margin-bottom: 10px; color: var(--text-muted);">No <b>MySQL e PostgreSQL</b>, o LIMIT vai no final do comando:</p>
+                    <pre>SELECT coluna1 \nFROM tabela \nLIMIT numero;</pre>
+
+                    <div class='highlight-box'>
+                        <h4><i class='fas fa-crown'></i> A Regra de Ouro (Uso do ORDER BY)</h4>
+                        <p>Se você usar o <code>TOP</code> ou <code>LIMIT</code> sozinho, o banco traz linhas "aleatórias" (as primeiras lidas). Se o seu objetivo é criar um "Ranking", você <b>obrigatoriamente</b> precisa usar o comando <code>ORDER BY</code>. O ORDER BY deve vir sempre <b>antes</b> do LIMIT.</p>
+                    </div>
+                `,
+                exemplos: `
+                    <h3><i class='fas fa-laptop-code'></i> Exemplo 1: Amostra Rápida</h3>
+                    <p>Ver apenas 3 alunos para conhecer as colunas:</p>
+                    <pre>-- Como seria com TOP (SQL Server):
+SELECT TOP 3 * FROM Alunos;
+
+-- Como seria com LIMIT (MySQL / PostgreSQL):
+SELECT * FROM Alunos LIMIT 3;</pre>
+                    <div class="result-table-container">
+                        <h4>Resultado do Exemplo 1</h4>
+                        <table class="result-table">
+                            <tr><th>IDAluno</th><th>NomeAluno</th><th>Turma</th><th>Cidade</th></tr>
+                            <tr><td>1</td><td>Ana Beatriz</td><td>1A</td><td>Guarabira</td></tr>
+                            <tr><td>2</td><td>João Pedro</td><td>1B</td><td>Cuité</td></tr>
+                            <tr><td>3</td><td>Maria Clara</td><td>2A</td><td>Guarabira</td></tr>
+                        </table>
+                    </div>
+                    <div class="highlight-box success"><i class="fas fa-check-circle"></i> O banco pegou as 3 primeiras linhas encontradas e ignorou as outras 17.</div>
+
+                    <h3 style="margin-top:2rem;"><i class='fas fa-sort-numeric-down'></i> Exemplo 2: Ranking</h3>
+                    <p>Ver os 5 livros mais antigos (usando ordenação):</p>
+                    <pre>-- Usando LIMIT (Final do comando):
+SELECT Titulo, AnoPublicacao FROM Livros 
+ORDER BY AnoPublicacao ASC 
+LIMIT 5;</pre>
+                    <div class="result-table-container">
+                        <h4>Resultado do Exemplo 2</h4>
+                        <table class="result-table">
+                            <tr><th>Titulo</th><th>AnoPublicacao</th></tr>
+                            <tr><td>Memórias Póstumas de Brás Cubas</td><td>1881</td></tr>
+                            <tr><td>O Cortiço</td><td>1890</td></tr>
+                            <tr><td>Dom Casmurro</td><td>1899</td></tr>
+                            <tr><td>Brasil República</td><td>2012</td></tr>
+                            <tr><td>Steve Jobs</td><td>2014</td></tr>
+                        </table>
+                    </div>
+                    <div class="highlight-box success"><i class="fas fa-check-circle"></i> O <b>ORDER BY</b> organizou todos os livros pelo mais antigo. Depois, o comando de limite (LIMIT ou TOP) cortou a lista deixando apenas os 5 primeiros.</div>
+                `,
+                quiz: [
+                    { q: "Selecione todos os dados dos 5 primeiros alunos da tabela Alunos usando TOP.", 
+                      ans: "SELECT TOP 5 * FROM Alunos", 
+                      blocks: ["SELECT", "TOP", "5", "*", "FROM", "Alunos", "LIMIT", "ORDER BY", "10", "Livros"],
+                      res: "<tr><th>IDAluno</th><th>NomeAluno</th><th>Turma</th><th>Cidade</th></tr><tr><td>1</td><td>Ana Beatriz</td><td>1A</td><td>Guarabira</td></tr><tr><td>2</td><td>João Pedro</td><td>1B</td><td>Cuité</td></tr><tr><td>3</td><td>Maria Clara</td><td>2A</td><td>Guarabira</td></tr><tr><td>4</td><td>Lucas Silva</td><td>2B</td><td>Picuí</td></tr><tr><td>5</td><td>Pedro Henrique</td><td>2A</td><td>Picuí</td></tr>" },
+                    { q: "Selecione apenas o título dos 3 primeiros Livros registrados usando LIMIT.", 
+                      ans: "SELECT Titulo FROM Livros LIMIT 3", 
+                      blocks: ["SELECT", "Titulo", "FROM", "Livros", "LIMIT", "3", "TOP", "Categorias", "DESC", "2"],
+                      res: "<tr><th>Titulo</th></tr><tr><td>Dom Casmurro</td></tr><tr><td>O Cortiço</td></tr><tr><td>Banco de Dados Básico</td></tr>" },
+                    { q: "Mostre todos os dados dos 2 primeiros Emprestimos usando TOP.", 
+                      ans: "SELECT TOP 2 * FROM Emprestimos", 
+                      blocks: ["SELECT", "TOP", "2", "*", "FROM", "Emprestimos", "LIMIT", "IDEmprestimo", "5", "ASC", "Alunos"],
+                      res: "<tr><th>IDEmprestimo</th><th>IDAluno</th><th>DataEmprestimo</th></tr><tr><td>5001</td><td>1</td><td>2026-05-10</td></tr><tr><td>5002</td><td>2</td><td>2026-05-11</td></tr>" },
+                    { q: "Selecione todas as colunas das 2 primeiras Categorias usando LIMIT.", 
+                      ans: "SELECT * FROM Categorias LIMIT 2", 
+                      blocks: ["SELECT", "*", "FROM", "Categorias", "LIMIT", "2", "TOP", "Livros", "NomeCategoria", "3", "WHERE"],
+                      res: "<tr><th>IDCategoria</th><th>NomeCategoria</th></tr><tr><td>1</td><td>Literatura</td></tr><tr><td>2</td><td>Tecnologia</td></tr>" },
+                    { q: "Selecione o Nome e a Turma dos 4 primeiros Alunos usando TOP.", 
+                      ans: "SELECT TOP 4 NomeAluno , Turma FROM Alunos", 
+                      blocks: ["SELECT", "TOP", "4", "NomeAluno", ",", "Turma", "FROM", "Alunos", "LIMIT", "IDAluno", "5", "WHERE"],
+                      res: "<tr><th>NomeAluno</th><th>Turma</th></tr><tr><td>Ana Beatriz</td><td>1A</td></tr><tr><td>João Pedro</td><td>1B</td></tr><tr><td>Maria Clara</td><td>2A</td></tr><tr><td>Lucas Silva</td><td>2B</td></tr>" }
+                ]
+            },
+            groupby: {
+                title: "GROUP BY e HAVING",
+                explicacao: `
+                    <h3><i class='fas fa-object-group'></i> O Poder dos Agrupamentos</h3>
+                    <p>O <strong>GROUP BY</strong> transforma uma lista gigante em um resumo. Você junta as fichas repetidas em "pilhas" separadas: pilha de 'Picuí', 'Cuité', etc. O GROUP BY agrupa as linhas, permitindo que você use funções como <code>COUNT</code> ou <code>SUM</code> para contar e somar cada pilha independentemente.</p>
+                `,
+                sintaxe: `
+                    <h3><i class='fas fa-terminal'></i> Sintaxe Básica:</h3>
+                    <pre>SELECT coluna, COUNT(id) \nFROM tabela \nGROUP BY coluna \nHAVING COUNT(id) > 10;</pre>
+                    <div class='highlight-box warning'>
+                        <h4><i class='fas fa-filter'></i> Diferença: WHERE vs HAVING</h4>
+                        <p>O <code>WHERE</code> filtra dados <b>ANTES</b> de empilhar. O <code>HAVING</code> filtra <b>DEPOIS</b> que as pilhas estão prontas. Como o <code>WHERE</code> não entende a função <code>COUNT()</code>, para filtrar as pilhas você obrigatoriamente usa <code>HAVING</code>.</p>
+                    </div>
+                `,
+                exemplos: `
+                    <h3><i class='fas fa-laptop-code'></i> Exemplo 1: Quantidade total de alunos por Turma</h3>
+                    <pre>SELECT Turma, COUNT(IDAluno) AS Total \nFROM Alunos \nGROUP BY Turma;</pre>
+                    <div class="result-table-container">
+                        <h4>Resultado do Exemplo 1</h4>
+                        <table class="result-table">
+                            <tr><th>Turma</th><th>Total</th></tr>
+                            <tr><td>1A</td><td>3</td></tr><tr><td>1B</td><td>3</td></tr>
+                            <tr><td>2A</td><td>4</td></tr><tr><td>2B</td><td>4</td></tr>
+                            <tr><td>3A</td><td>3</td></tr><tr><td>3B</td><td>3</td></tr>
+                        </table>
+                    </div>
+                    <div class="highlight-box success"><i class="fas fa-check-circle"></i> O banco criou 6 "pilhas" baseadas nos nomes das turmas e contou as fichas dentro de cada uma.</div>
+
+                    <h3 style="margin-top:2rem;"><i class='fas fa-laptop-code'></i> Exemplo 2: O filtro HAVING</h3>
+                    <p>Quero apenas as turmas que possuem MAIS de 3 alunos:</p>
+                    <pre>SELECT Turma, COUNT(IDAluno) AS Total \nFROM Alunos \nGROUP BY Turma \nHAVING COUNT(IDAluno) > 3;</pre>
+                    <div class="result-table-container">
+                        <h4>Resultado do Exemplo 2</h4>
+                        <table class="result-table">
+                            <tr><th>Turma</th><th>Total</th></tr>
+                            <tr><td>2A</td><td>4</td></tr>
+                            <tr><td>2B</td><td>4</td></tr>
+                        </table>
+                    </div>
+                    <div class="highlight-box success"><i class="fas fa-check-circle"></i> O HAVING olhou para as 6 pilhas do exemplo anterior e destruiu todas as que não batiam com a regra (> 3).</div>
+                `,
+                quiz: [
+                    { q: "Agrupe os alunos por 'Turma' contando os IDs.", ans: "SELECT Turma , COUNT ( IDAluno ) FROM Alunos GROUP BY Turma", blocks: ["SELECT", "Turma", ",", "COUNT", "(", "IDAluno", ")", "FROM", "Alunos", "GROUP BY", "Turma", "HAVING", "*", "WHERE"], res: "<tr><th>Turma</th><th>COUNT</th></tr><tr><td>1A</td><td>3</td></tr><tr><td>1B</td><td>3</td></tr><tr><td>2A</td><td>4</td></tr><tr><td>2B</td><td>4</td></tr><tr><td>3A</td><td>3</td></tr><tr><td>3B</td><td>3</td></tr>" },
+                    { q: "Conte os livros de cada IDCategoria usando Group By.", ans: "SELECT IDCategoria , COUNT ( IDLivro ) FROM Livros GROUP BY IDCategoria", blocks: ["SELECT", "IDCategoria", ",", "COUNT", "(", "IDLivro", ")", "FROM", "Livros", "GROUP BY", "IDCategoria", "HAVING", "*"], res: "<tr><th>IDCategoria</th><th>COUNT</th></tr><tr><td>1</td><td>5</td></tr><tr><td>2</td><td>5</td></tr><tr><td>3</td><td>5</td></tr><tr><td>4</td><td>3</td></tr><tr><td>5</td><td>3</td></tr><tr><td>6</td><td>3</td></tr><tr><td>7</td><td>3</td></tr><tr><td>8</td><td>3</td></tr>" },
+                    { q: "Mostre apenas as Cidades que possuem MAIS de 3 alunos.", ans: "SELECT Cidade FROM Alunos GROUP BY Cidade HAVING COUNT ( IDAluno ) > 3", blocks: ["SELECT", "Cidade", "FROM", "Alunos", "GROUP BY", "Cidade", "HAVING", "COUNT", "(", "IDAluno", ")", ">", "3", "<", "5"], res: "<tr><th>Cidade</th></tr><tr><td>Cuité</td></tr><tr><td>Nova Floresta</td></tr><tr><td>Picuí</td></tr>" },
+                    { q: "Agrupe Emprestimos por IDAluno contando quantos emprestimos cada um fez.", ans: "SELECT IDAluno , COUNT ( IDEmprestimo ) FROM Emprestimos GROUP BY IDAluno", blocks: ["SELECT", "IDAluno", ",", "COUNT", "(", "IDEmprestimo", ")", "FROM", "Emprestimos", "GROUP BY", "IDAluno", "HAVING"], res: "<tr><th>IDAluno</th><th>COUNT</th></tr><tr><td>1</td><td>2</td></tr><tr><td>2</td><td>1</td></tr><tr><td>3</td><td>1</td></tr><tr><td>5</td><td>1</td></tr><tr><td>6</td><td>1</td></tr><tr><td>7</td><td>1</td></tr><tr><td>8</td><td>1</td></tr><tr><td>9</td><td>1</td></tr><tr><td>10</td><td>1</td></tr><tr><td>11</td><td>1</td></tr><tr><td>12</td><td>1</td></tr><tr><td>13</td><td>1</td></tr><tr><td>14</td><td>1</td></tr><tr><td>15</td><td>1</td></tr><tr><td>16</td><td>1</td></tr><tr><td>17</td><td>1</td></tr><tr><td>18</td><td>1</td></tr><tr><td>19</td><td>1</td></tr><tr><td>20</td><td>1</td></tr>" },
+                    { q: "Filtre as Turmas que possuam exatamente 4 alunos usando Having.", ans: "SELECT Turma FROM Alunos GROUP BY Turma HAVING COUNT ( IDAluno ) = 4", blocks: ["SELECT", "Turma", "FROM", "Alunos", "GROUP BY", "Turma", "HAVING", "COUNT", "(", "IDAluno", ")", "=", "4", ">", "<"], res: "<tr><th>Turma</th></tr><tr><td>2A</td></tr><tr><td>2B</td></tr>" }
+                ]
+            },
+            union: {
+                title: "UNION",
+                explicacao: `
+                    <h3><i class='fas fa-link'></i> Colando Tabelas Verticais</h3>
+                    <p>O operador <strong>UNION</strong> empilha os resultados de consultas diferentes <b>de cima para baixo</b>, fundindo colunas parecidas em uma só.</p>
+                `,
+                sintaxe: `
+                    <h3><i class='fas fa-terminal'></i> Sintaxe Básica:</h3>
+                    <pre>SELECT coluna_x FROM tabela1\nUNION\nSELECT coluna_y FROM tabela2;</pre>
+                    <div class='highlight-box'>
+                        <h4><i class='fas fa-gavel'></i> As 3 Regras Inquebráveis:</h4>
+                        <ol>
+                            <li>O número de colunas pedidas no 1º SELECT deve ser <b>igual</b> ao do 2º SELECT.</li>
+                            <li>Os tipos de dados devem ser compatíveis.</li>
+                            <li>A ordem das colunas no comando deve ser a mesma.</li>
+                        </ol>
+                    </div>
+                `,
+                exemplos: `
+                    <h3><i class='fas fa-laptop-code'></i> Exemplo: Nomes de Alunos e Títulos de Livros numa só lista</h3>
+                    <pre>SELECT NomeAluno AS Cadastro FROM Alunos\nUNION\nSELECT Titulo FROM Livros;</pre>
+                    <div class="result-table-container">
+                        <h4>Resultado do Exemplo (Uma coluna com 50 linhas!)</h4>
+                        <table class="result-table">
+                            <tr><th>Cadastro</th></tr>
+                            <tr><td>Ana Beatriz</td></tr>
+                            <tr><td>... (outros 19 alunos)</td></tr>
+                            <tr><td>Dom Casmurro</td></tr>
+                            <tr><td>O Cortiço</td></tr>
+                            <tr><td>... (outros 28 livros)</td></tr>
+                        </table>
+                    </div>
+                    <div class="highlight-box success"><i class="fas fa-check-circle"></i> O <b>UNION</b> converteu duas listas em uma única coluna chamada "Cadastro". Ele também deletou possíveis duplicatas. Se quiséssemos preservar duplicatas, teríamos escrito <code>UNION ALL</code>.</div>
+                `,
+                quiz: [
+                    { q: "Faça um UNION entre NomeAluno (Alunos) e Titulo (Livros).", ans: "SELECT NomeAluno FROM Alunos UNION SELECT Titulo FROM Livros", blocks: ["SELECT", "NomeAluno", "FROM", "Alunos", "UNION", "SELECT", "Titulo", "FROM", "Livros", "JOIN", "*"], res: "<tr><th>NomeAluno</th></tr><tr><td>Ana Beatriz</td></tr><tr><td>João Pedro</td></tr><tr><td>Maria Clara</td></tr><tr><td>Lucas Silva</td></tr><tr><td>Pedro Henrique</td></tr><tr><td>Juliana Souza</td></tr><tr><td>Gabriel Alves</td></tr><tr><td>Amanda Lima</td></tr><tr><td>Carlos Eduardo</td></tr><tr><td>Fernanda Gomes</td></tr><tr><td>José Roberto</td></tr><tr><td>Bianca Martins</td></tr><tr><td>Marcos Vinícius</td></tr><tr><td>Larissa Melo</td></tr><tr><td>Rafael Oliveira</td></tr><tr><td>Vitória Santos</td></tr><tr><td>Mateus Pereira</td></tr><tr><td>Camila Ferreira</td></tr><tr><td>Eduarda Costa</td></tr><tr><td>Leonardo Barbosa</td></tr><tr><td>Dom Casmurro</td></tr><tr><td>O Cortiço</td></tr><tr><td>Banco de Dados Básico</td></tr><tr><td>Algoritmos em Python</td></tr><tr><td>História da Paraíba</td></tr><tr><td>Introdução à Programação</td></tr><tr><td>Redes de Computadores</td></tr><tr><td>Inteligência Artificial</td></tr><tr><td>Matemática Básica</td></tr><tr><td>Álgebra Linear</td></tr><tr><td>Geometria Plana</td></tr><tr><td>Física para Iniciantes</td></tr><tr><td>Química Geral</td></tr><tr><td>Biologia Moderna</td></tr><tr><td>Geografia do Brasil</td></tr><tr><td>Atlas Mundial</td></tr><tr><td>Cartografia Básica</td></tr><tr><td>Introdução à Filosofia</td></tr><tr><td>Ética e Sociedade</td></tr><tr><td>Pensadores Modernos</td></tr><tr><td>Steve Jobs</td></tr><tr><td>Nelson Mandela</td></tr><tr><td>Marie Curie</td></tr><tr><td>Memórias Póstumas de Brás Cubas</td></tr><tr><td>Vidas Secas</td></tr><tr><td>Capitães da Areia</td></tr><tr><td>Brasil República</td></tr><tr><td>História Geral</td></tr><tr><td>Segunda Guerra Mundial</td></tr><tr><td>História da América Latina</td></tr>" },
+                    { q: "Combine a coluna Cidade (Alunos) e NomeCategoria (Categorias).", ans: "SELECT Cidade FROM Alunos UNION SELECT NomeCategoria FROM Categorias", blocks: ["SELECT", "Cidade", "FROM", "Alunos", "UNION", "SELECT", "NomeCategoria", "FROM", "Categorias", "ALL", "JOIN"], res: "<tr><th>Cidade</th></tr><tr><td>Barra de Santa Rosa</td></tr><tr><td>Cuité</td></tr><tr><td>Guarabira</td></tr><tr><td>Nova Floresta</td></tr><tr><td>Picuí</td></tr><tr><td>Biografias</td></tr><tr><td>Ciências</td></tr><tr><td>Filosofia</td></tr><tr><td>Geografia</td></tr><tr><td>História</td></tr><tr><td>Literatura</td></tr><tr><td>Matemática</td></tr><tr><td>Tecnologia</td></tr>" },
+                    { q: "Junte a coluna IDAluno de Alunos com IDEmprestimo de Emprestimos.", ans: "SELECT IDAluno FROM Alunos UNION SELECT IDEmprestimo FROM Emprestimos", blocks: ["SELECT", "IDAluno", "FROM", "Alunos", "UNION", "SELECT", "IDEmprestimo", "FROM", "Emprestimos", "ALL"], res: "<tr><th>IDAluno</th></tr><tr><td>1</td></tr><tr><td>2</td></tr><tr><td>3</td></tr><tr><td>4</td></tr><tr><td>5</td></tr><tr><td>6</td></tr><tr><td>7</td></tr><tr><td>8</td></tr><tr><td>9</td></tr><tr><td>10</td></tr><tr><td>11</td></tr><tr><td>12</td></tr><tr><td>13</td></tr><tr><td>14</td></tr><tr><td>15</td></tr><tr><td>16</td></tr><tr><td>17</td></tr><tr><td>18</td></tr><tr><td>19</td></tr><tr><td>20</td></tr><tr><td>5001</td></tr><tr><td>5002</td></tr><tr><td>5003</td></tr><tr><td>5004</td></tr><tr><td>5005</td></tr><tr><td>5006</td></tr><tr><td>5007</td></tr><tr><td>5008</td></tr><tr><td>5009</td></tr><tr><td>5010</td></tr><tr><td>5011</td></tr><tr><td>5012</td></tr><tr><td>5013</td></tr><tr><td>5014</td></tr><tr><td>5015</td></tr><tr><td>5016</td></tr><tr><td>5017</td></tr><tr><td>5018</td></tr><tr><td>5019</td></tr><tr><td>5020</td></tr>" },
+                    { q: "Faça um UNION pegando Turma (Alunos) e AnoPublicacao (Livros).", ans: "SELECT Turma FROM Alunos UNION SELECT AnoPublicacao FROM Livros", blocks: ["SELECT", "Turma", "FROM", "Alunos", "UNION", "SELECT", "AnoPublicacao", "FROM", "Livros", "ALL"], res: "<tr><th>Turma</th></tr><tr><td>1A</td></tr><tr><td>1B</td></tr><tr><td>2A</td></tr><tr><td>2B</td></tr><tr><td>3A</td></tr><tr><td>3B</td></tr><tr><td>1881</td></tr><tr><td>1890</td></tr><tr><td>1899</td></tr><tr><td>1937</td></tr><tr><td>1938</td></tr><tr><td>2012</td></tr><tr><td>2014</td></tr><tr><td>2015</td></tr><tr><td>2016</td></tr><tr><td>2017</td></tr><tr><td>2018</td></tr><tr><td>2019</td></tr><tr><td>2020</td></tr><tr><td>2021</td></tr><tr><td>2022</td></tr><tr><td>2023</td></tr><tr><td>2024</td></tr>" },
+                    { q: "Junte NomeAluno e Cidade da tabela Alunos usando UNION.", ans: "SELECT NomeAluno FROM Alunos UNION SELECT Cidade FROM Alunos", blocks: ["SELECT", "NomeAluno", "FROM", "Alunos", "UNION", "SELECT", "Cidade", "FROM", "Alunos", "Turma", "ALL"], res: "<tr><th>NomeAluno</th></tr><tr><td>Amanda Lima</td></tr><tr><td>Ana Beatriz</td></tr><tr><td>Barra de Santa Rosa</td></tr><tr><td>Bianca Martins</td></tr><tr><td>Camila Ferreira</td></tr><tr><td>Carlos Eduardo</td></tr><tr><td>Cuité</td></tr><tr><td>Eduarda Costa</td></tr><tr><td>Fernanda Gomes</td></tr><tr><td>Gabriel Alves</td></tr><tr><td>Guarabira</td></tr><tr><td>José Roberto</td></tr><tr><td>João Pedro</td></tr><tr><td>Juliana Souza</td></tr><tr><td>Larissa Melo</td></tr><tr><td>Leonardo Barbosa</td></tr><tr><td>Lucas Silva</td></tr><tr><td>Marcos Vinícius</td></tr><tr><td>Maria Clara</td></tr><tr><td>Mateus Pereira</td></tr><tr><td>Nova Floresta</td></tr><tr><td>Pedro Henrique</td></tr><tr><td>Picuí</td></tr><tr><td>Rafael Oliveira</td></tr><tr><td>Vitória Santos</td></tr>" }
+                ]
+            },
+            exists: {
+                title: "EXISTS",
+                explicacao: `
+                    <h3><i class='fas fa-user-shield'></i> O Segurança da Balada (EXISTS)</h3>
+                    <p>O operador <strong>EXISTS</strong> responde "Sim ou Não". Ele olha uma linha da tabela principal, procura na tabela da subconsulta e, se achar <b>uma única correspondência</b>, ele aprova e exibe a linha principal.</p>
+                `,
+                sintaxe: `
+                    <h3><i class='fas fa-terminal'></i> Sintaxe Básica:</h3>
+                    <pre>SELECT colunas FROM TabelaA \nWHERE EXISTS \n  (SELECT 1 FROM TabelaB WHERE TabelaB.ID = TabelaA.ID);</pre>
+                    <div class='highlight-box'>
+                        <h4><i class='fas fa-bolt'></i> Performance Absoluta (SELECT 1)</h4>
+                        <p>Como o EXISTS só quer saber "se tem registro" e não "qual é o registro", nós usamos <code>SELECT 1</code> dentro da subconsulta. Além disso, assim que ele encontra o primeiro, ele aplica um <i>Short-Circuit</i> (para de ler a tabela B inteira e já aprova a linha).</p>
+                    </div>
+                `,
+                exemplos: `
+                    <h3><i class='fas fa-laptop-code'></i> Exemplo: Mostrar alunos que já fizeram pelo menos um empréstimo</h3>
+                    <pre>SELECT NomeAluno FROM Alunos A WHERE EXISTS \n(SELECT 1 FROM Emprestimos E WHERE E.IDAluno = A.IDAluno);</pre>
+                    <div class="result-table-container">
+                        <h4>Resultado do Exemplo</h4>
+                        <table class="result-table">
+                            <tr><th>NomeAluno</th></tr>
+                            <tr><td>Ana Beatriz</td></tr>
+                            <tr><td>João Pedro</td></tr>
+                            <tr><td>Maria Clara</td></tr>
+                            <tr><td>Pedro Henrique</td></tr>
+                            <tr><td>... (19 alunos no total)</td></tr>
+                        </table>
+                    </div>
+                    <div class="highlight-box success"><i class="fas fa-check-circle"></i> O sistema omitiu "Lucas Silva" porque, ao varrer a tabela de Empréstimos, o EXISTS retornou FALSO para o ID dele.</div>
+                `,
+                quiz: [
+                    { q: "Títulos de Livros que já foram emprestados (existem em ItensEmprestimo).", ans: "SELECT Titulo FROM Livros WHERE EXISTS ( SELECT 1 FROM ItensEmprestimo WHERE ItensEmprestimo.IDLivro = Livros.IDLivro )", blocks: ["SELECT", "Titulo", "FROM", "Livros", "WHERE", "EXISTS", "(", "SELECT 1", "FROM", "ItensEmprestimo", "WHERE", "ItensEmprestimo.IDLivro", "=", "Livros.IDLivro", ")", "IN", "ANY"], res: "<tr><th>Titulo</th></tr><tr><td>Dom Casmurro</td></tr><tr><td>O Cortiço</td></tr><tr><td>Banco de Dados Básico</td></tr><tr><td>Algoritmos em Python</td></tr><tr><td>História da Paraíba</td></tr><tr><td>Introdução à Programação</td></tr><tr><td>Redes de Computadores</td></tr><tr><td>Inteligência Artificial</td></tr><tr><td>Matemática Básica</td></tr><tr><td>Álgebra Linear</td></tr><tr><td>Geometria Plana</td></tr><tr><td>Física para Iniciantes</td></tr><tr><td>Química Geral</td></tr><tr><td>Biologia Moderna</td></tr><tr><td>Geografia do Brasil</td></tr><tr><td>Atlas Mundial</td></tr><tr><td>Cartografia Básica</td></tr><tr><td>Introdução à Filosofia</td></tr><tr><td>Ética e Sociedade</td></tr><tr><td>Pensadores Modernos</td></tr><tr><td>Steve Jobs</td></tr><tr><td>Nelson Mandela</td></tr><tr><td>Marie Curie</td></tr><tr><td>Memórias Póstumas de Brás Cubas</td></tr><tr><td>Vidas Secas</td></tr><tr><td>Capitães da Areia</td></tr><tr><td>Brasil República</td></tr><tr><td>História Geral</td></tr><tr><td>Segunda Guerra Mundial</td></tr><tr><td>História da América Latina</td></tr>" },
+                    { q: "NomeAluno para alunos que existem na tabela Emprestimos.", ans: "SELECT NomeAluno FROM Alunos WHERE EXISTS ( SELECT IDAluno FROM Emprestimos WHERE Emprestimos.IDAluno = Alunos.IDAluno )", blocks: ["SELECT", "NomeAluno", "FROM", "Alunos", "WHERE", "EXISTS", "(", "SELECT", "IDAluno", "FROM", "Emprestimos", "WHERE", "Emprestimos.IDAluno", "=", "Alunos.IDAluno", ")", "ANY"], res: "<tr><th>NomeAluno</th></tr><tr><td>Ana Beatriz</td></tr><tr><td>João Pedro</td></tr><tr><td>Maria Clara</td></tr><tr><td>Pedro Henrique</td></tr><tr><td>Juliana Souza</td></tr><tr><td>Gabriel Alves</td></tr><tr><td>Amanda Lima</td></tr><tr><td>Carlos Eduardo</td></tr><tr><td>Fernanda Gomes</td></tr><tr><td>José Roberto</td></tr><tr><td>Bianca Martins</td></tr><tr><td>Marcos Vinícius</td></tr><tr><td>Larissa Melo</td></tr><tr><td>Rafael Oliveira</td></tr><tr><td>Vitória Santos</td></tr><tr><td>Mateus Pereira</td></tr><tr><td>Camila Ferreira</td></tr><tr><td>Eduarda Costa</td></tr><tr><td>Leonardo Barbosa</td></tr>" },
+                    { q: "Todos os dados de Emprestimos SE existir algum empréstimo feito no dia '2026-05-10'.", ans: "SELECT * FROM Emprestimos WHERE EXISTS ( SELECT * FROM Emprestimos WHERE DataEmprestimo = '2026-05-10' )", blocks: ["SELECT", "*", "FROM", "Emprestimos", "WHERE", "EXISTS", "(", "SELECT", "*", "FROM", "Emprestimos", "WHERE", "DataEmprestimo", "=", "'2026-05-10'", ")", "ANY"], res: "<tr><th>IDEmprestimo</th><th>IDAluno</th><th>DataEmprestimo</th></tr><tr><td>5001</td><td>1</td><td>2026-05-10</td></tr><tr><td>5002</td><td>2</td><td>2026-05-11</td></tr><tr><td>5003</td><td>1</td><td>2026-05-15</td></tr><tr><td>5004</td><td>3</td><td>2026-05-18</td></tr><tr><td>5005</td><td>5</td><td>2026-05-20</td></tr><tr><td>5006</td><td>6</td><td>2026-05-21</td></tr><tr><td>5007</td><td>7</td><td>2026-05-22</td></tr><tr><td>5008</td><td>8</td><td>2026-05-22</td></tr><tr><td>5009</td><td>9</td><td>2026-05-23</td></tr><tr><td>5010</td><td>10</td><td>2026-05-24</td></tr><tr><td>5011</td><td>11</td><td>2026-05-25</td></tr><tr><td>5012</td><td>12</td><td>2026-05-26</td></tr><tr><td>5013</td><td>13</td><td>2026-05-27</td></tr><tr><td>5014</td><td>14</td><td>2026-05-28</td></tr><tr><td>5015</td><td>15</td><td>2026-05-29</td></tr><tr><td>5016</td><td>16</td><td>2026-05-30</td></tr><tr><td>5017</td><td>17</td><td>2026-06-01</td></tr><tr><td>5018</td><td>18</td><td>2026-06-02</td></tr><tr><td>5019</td><td>19</td><td>2026-06-03</td></tr><tr><td>5020</td><td>20</td><td>2026-06-04</td></tr>" },
+                    { q: "Categorias que já possuem Livros associados a elas.", ans: "SELECT NomeCategoria FROM Categorias WHERE EXISTS ( SELECT 1 FROM Livros WHERE Livros.IDCategoria = Categorias.IDCategoria )", blocks: ["SELECT", "NomeCategoria", "FROM", "Categorias", "WHERE", "EXISTS", "(", "SELECT 1", "FROM", "Livros", "WHERE", "Livros.IDCategoria", "=", "Categorias.IDCategoria", ")", "ANY"], res: "<tr><th>NomeCategoria</th></tr><tr><td>Literatura</td></tr><tr><td>Tecnologia</td></tr><tr><td>História</td></tr><tr><td>Ciências</td></tr><tr><td>Matemática</td></tr><tr><td>Geografia</td></tr><tr><td>Filosofia</td></tr><tr><td>Biografias</td></tr>" },
+                    { q: "Cidade dos alunos, se eles possuem um Emprestimo registrado.", ans: "SELECT Cidade FROM Alunos WHERE EXISTS ( SELECT 1 FROM Emprestimos WHERE Emprestimos.IDAluno = Alunos.IDAluno )", blocks: ["SELECT", "Cidade", "FROM", "Alunos", "WHERE", "EXISTS", "(", "SELECT 1", "FROM", "Emprestimos", "WHERE", "Emprestimos.IDAluno", "=", "Alunos.IDAluno", ")", "ANY"], res: "<tr><th>Cidade</th></tr><tr><td>Guarabira</td></tr><tr><td>Cuité</td></tr><tr><td>Guarabira</td></tr><tr><td>Picuí</td></tr><tr><td>Nova Floresta</td></tr><tr><td>Cuité</td></tr><tr><td>Picuí</td></tr><tr><td>Barra de Santa Rosa</td></tr><tr><td>Picuí</td></tr><tr><td>Nova Floresta</td></tr><tr><td>Cuité</td></tr><tr><td>Picuí</td></tr><tr><td>Nova Floresta</td></tr><tr><td>Cuité</td></tr><tr><td>Picuí</td></tr><tr><td>Barra de Santa Rosa</td></tr><tr><td>Picuí</td></tr><tr><td>Cuité</td></tr><tr><td>Nova Floresta</td></tr>" }
+                ]
+            },
+            any: {
+                title: "ANY",
+                explicacao: `
+                    <h3><i class='fas fa-random'></i> Qualquer um da Lista</h3>
+                    <p>No SQL, geralmente comparamos um valor com outro único (ex: <code>idade = 18</code>). Mas com o <strong>ANY</strong>, você pode comparar um valor principal com uma matriz inteira gerada por uma subconsulta.</p>
+                    <p>Se a condição bater como verdadeira para <b>QUALQUER UM</b> dos itens retornados no balde, a linha é aprovada.</p>
+                `,
+                sintaxe: `
+                    <h3><i class='fas fa-terminal'></i> Sintaxe Básica:</h3>
+                    <pre>SELECT coluna FROM tabela \nWHERE coluna_verificada > ANY \n(SELECT coluna_lista FROM outra_tabela);</pre>
+                    <div class='highlight-box warning'>
+                        <h4><i class='fas fa-balance-scale'></i> Diferença entre ANY e IN</h4>
+                        <p>O operador <code>IN</code> verifica apenas se o valor é <b>IGUAL</b> a algum da lista. A força do <code>ANY</code> é trabalhar de forma elástica com outros sinais lógicos (Ex: <code>> ANY</code>, <code>< ANY</code> ou <code>!= ANY</code>).</p>
+                    </div>
+                `,
+                exemplos: `
+                    <h3><i class='fas fa-laptop-code'></i> Exemplo: Livros de ANY (qualquer) categoria cujo ID seja MAIOR que 5</h3>
+                    <pre>SELECT Titulo FROM Livros \nWHERE IDCategoria > ANY \n(SELECT IDCategoria FROM Categorias WHERE IDCategoria = 5);</pre>
+                    <div class="result-table-container">
+                        <h4>Resultado do Exemplo</h4>
+                        <table class="result-table">
+                            <tr><th>Titulo</th></tr>
+                            <tr><td>Geografia do Brasil</td></tr>
+                            <tr><td>Atlas Mundial</td></tr>
+                            <tr><td>Cartografia Básica</td></tr>
+                            <tr><td>Introdução à Filosofia</td></tr>
+                            <tr><td>Ética e Sociedade</td></tr>
+                            <tr><td>Pensadores Modernos</td></tr>
+                            <tr><td>Steve Jobs</td></tr>
+                            <tr><td>Nelson Mandela</td></tr>
+                            <tr><td>Marie Curie</td></tr>
+                        </table>
+                    </div>
+                    <div class="highlight-box success"><i class="fas fa-check-circle"></i> O banco comparou as categorias (6, 7 e 8) e viu que todas são MAIORES ( > ) que 5, trazendo apenas livros de Geografia, Filosofia e Biografias.</div>
+                `,
+                quiz: [
+                    { q: "Livros onde AnoPublicacao seja igual a ANY ano da categoria 1.", ans: "SELECT Titulo FROM Livros WHERE AnoPublicacao = ANY ( SELECT AnoPublicacao FROM Livros WHERE IDCategoria = 1 )", blocks: ["SELECT", "Titulo", "FROM", "Livros", "WHERE", "AnoPublicacao", "=", "ANY", "(", "SELECT", "AnoPublicacao", "FROM", "Livros", "WHERE", "IDCategoria", "=", "1", ")", "EXISTS", "IN"], res: "<tr><th>Titulo</th></tr><tr><td>Dom Casmurro</td></tr><tr><td>O Cortiço</td></tr><tr><td>Memórias Póstumas de Brás Cubas</td></tr><tr><td>Vidas Secas</td></tr><tr><td>Capitães da Areia</td></tr>" },
+                    { q: "Nome do Aluno onde IDAluno = ANY IDAluno de Emprestimos.", ans: "SELECT NomeAluno FROM Alunos WHERE IDAluno = ANY ( SELECT IDAluno FROM Emprestimos )", blocks: ["SELECT", "NomeAluno", "FROM", "Alunos", "WHERE", "IDAluno", "=", "ANY", "(", "SELECT", "IDAluno", "FROM", "Emprestimos", ")", "EXISTS", "*"], res: "<tr><th>NomeAluno</th></tr><tr><td>Ana Beatriz</td></tr><tr><td>João Pedro</td></tr><tr><td>Maria Clara</td></tr><tr><td>Pedro Henrique</td></tr><tr><td>Juliana Souza</td></tr><tr><td>Gabriel Alves</td></tr><tr><td>Amanda Lima</td></tr><tr><td>Carlos Eduardo</td></tr><tr><td>Fernanda Gomes</td></tr><tr><td>José Roberto</td></tr><tr><td>Bianca Martins</td></tr><tr><td>Marcos Vinícius</td></tr><tr><td>Larissa Melo</td></tr><tr><td>Rafael Oliveira</td></tr><tr><td>Vitória Santos</td></tr><tr><td>Mateus Pereira</td></tr><tr><td>Camila Ferreira</td></tr><tr><td>Eduarda Costa</td></tr><tr><td>Leonardo Barbosa</td></tr>" },
+                    { q: "Titulo dos Livros cujo IDLivro = ANY IDLivro de ItensEmprestimo.", ans: "SELECT Titulo FROM Livros WHERE IDLivro = ANY ( SELECT IDLivro FROM ItensEmprestimo )", blocks: ["SELECT", "Titulo", "FROM", "Livros", "WHERE", "IDLivro", "=", "ANY", "(", "SELECT", "IDLivro", "FROM", "ItensEmprestimo", ")", "EXISTS", "IN"], res: "<tr><th>Titulo</th></tr><tr><td>Dom Casmurro</td></tr><tr><td>O Cortiço</td></tr><tr><td>Banco de Dados Básico</td></tr><tr><td>Algoritmos em Python</td></tr><tr><td>História da Paraíba</td></tr><tr><td>Introdução à Programação</td></tr><tr><td>Redes de Computadores</td></tr><tr><td>Inteligência Artificial</td></tr><tr><td>Matemática Básica</td></tr><tr><td>Álgebra Linear</td></tr><tr><td>Geometria Plana</td></tr><tr><td>Física para Iniciantes</td></tr><tr><td>Química Geral</td></tr><tr><td>Biologia Moderna</td></tr><tr><td>Geografia do Brasil</td></tr><tr><td>Atlas Mundial</td></tr><tr><td>Cartografia Básica</td></tr><tr><td>Introdução à Filosofia</td></tr><tr><td>Ética e Sociedade</td></tr><tr><td>Pensadores Modernos</td></tr><tr><td>Steve Jobs</td></tr><tr><td>Nelson Mandela</td></tr><tr><td>Marie Curie</td></tr><tr><td>Memórias Póstumas de Brás Cubas</td></tr><tr><td>Vidas Secas</td></tr><tr><td>Capitães da Areia</td></tr><tr><td>Brasil República</td></tr><tr><td>História Geral</td></tr><tr><td>Segunda Guerra Mundial</td></tr><tr><td>História da América Latina</td></tr>" },
+                    { q: "NomeCategoria cuja IDCategoria = ANY IDCategoria da tabela Livros.", ans: "SELECT NomeCategoria FROM Categorias WHERE IDCategoria = ANY ( SELECT IDCategoria FROM Livros )", blocks: ["SELECT", "NomeCategoria", "FROM", "Categorias", "WHERE", "IDCategoria", "=", "ANY", "(", "SELECT", "IDCategoria", "FROM", "Livros", ")", "EXISTS", "IDLivro"], res: "<tr><th>NomeCategoria</th></tr><tr><td>Literatura</td></tr><tr><td>Tecnologia</td></tr><tr><td>História</td></tr><tr><td>Ciências</td></tr><tr><td>Matemática</td></tr><tr><td>Geografia</td></tr><tr><td>Filosofia</td></tr><tr><td>Biografias</td></tr>" },
+                    { q: "IDEmprestimo onde IDAluno = ANY IDAluno da cidade 'Picuí'.", ans: "SELECT IDEmprestimo FROM Emprestimos WHERE IDAluno = ANY ( SELECT IDAluno FROM Alunos WHERE Cidade = 'Picuí' )", blocks: ["SELECT", "IDEmprestimo", "FROM", "Emprestimos", "WHERE", "IDAluno", "=", "ANY", "(", "SELECT", "IDAluno", "FROM", "Alunos", "WHERE", "Cidade", "=", "'Picuí'", ")", "EXISTS", "ALL"], res: "<tr><th>IDEmprestimo</th></tr><tr><td>5005</td></tr><tr><td>5008</td></tr><tr><td>5010</td></tr><tr><td>5013</td></tr><tr><td>5016</td></tr><tr><td>5018</td></tr>" }
+                ]
+            }
+        };
+
+        function applySQLHighlighting() {
+            document.querySelectorAll('.code-area pre').forEach(block => {
+                let text = block.innerHTML;
+                const keywords = ['SELECT', 'FROM', 'WHERE', 'GROUP BY', 'HAVING', 'UNION', 'EXISTS', 'ANY', 'TOP', 'ORDER BY', 'AS', 'AND', 'OR', 'ON', 'JOIN', 'INNER', 'ALL'];
+                keywords.forEach(kw => {
+                    let re = new RegExp('\\b' + kw + '\\b', 'g');
+                    text = text.replace(re, `<span class="hl-keyword">${kw}</span>`);
+                });
+                text = text.replace(/\b(COUNT|MAX|MIN|SUM|AVG)\b/g, '<span class="hl-func">$1</span>');
+                text = text.replace(/\b(\d+)\b/g, '<span class="hl-num">$1</span>');
+                text = text.replace(/'([^']+)'/g, '<span class="hl-str">\'$1\'</span>');
+                block.innerHTML = text;
+            });
+        }
+
+        function getBlockColorClass(text) {
+            const keywords = ['SELECT', 'FROM', 'WHERE', 'GROUP BY', 'HAVING', 'UNION', 'EXISTS', 'ANY', 'TOP', 'ORDER BY', 'AS', 'AND', 'OR', 'ON', 'JOIN', 'INNER', 'IN', 'ALL'];
+            const funcs = ['COUNT', 'MAX', 'MIN', 'SUM', 'AVG'];
+            if (keywords.includes(text)) return 'k-keyword';
+            if (funcs.includes(text)) return 'k-func';
+            if (!isNaN(text) && text.trim() !== '') return 'k-num';
+            if (text.startsWith("'") && text.endsWith("'")) return 'k-str';
+            return 'k-default';
+        }
+
+        let currentLesson = "";
+        let currentQuizIndex = 0;
+        let stats = { correct: 0, wrong: 0 };
+        let quizHistory = [];
+        let questionAnswered = false;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            const targetBtn = document.querySelector(`[data-target="tab-${tabId}"]`);
+            if(targetBtn) targetBtn.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        function loadLesson(lessonKey) {
+            currentLesson = lessonKey;
+            const data = lessonsData[lessonKey];
+            
+            document.getElementById('lesson-title').innerHTML = `<i class="fas fa-terminal"></i> Comando ${data.title}`;
+            document.getElementById('tab-explicacao').innerHTML = data.explicacao;
+            document.getElementById('tab-sintaxe').innerHTML = data.sintaxe;
+            document.getElementById('tab-exemplos').innerHTML = data.exemplos;
+            document.getElementById('stat-cmd-name').innerText = data.title;
+            
+            applySQLHighlighting(); 
+            
+            currentQuizIndex = 0;
+            stats = { correct: 0, wrong: 0 };
+            quizHistory = [];
+            document.getElementById('quiz-area').style.display = 'block';
+            document.getElementById('quiz-stats').style.display = 'none';
+            
+            loadQuizQuestion();
+            showScreen('lesson-screen');
+            switchTab('explicacao');
+        }
+
+        function loadQuizQuestion() {
+            const quiz = lessonsData[currentLesson].quiz[currentQuizIndex];
+            questionAnswered = false;
+            
+            document.getElementById('quiz-progress').innerHTML = `<i class="fas fa-flag"></i> Pergunta ${currentQuizIndex + 1} de 5`;
+            document.getElementById('quiz-question').innerHTML = `<i class="fas fa-question-circle" style="color: var(--warning);"></i> ${quiz.q}`;
+            
+            const dropZone = document.getElementById('quiz-answer-zone');
+            const blockBank = document.getElementById('quiz-block-bank');
+            dropZone.innerHTML = '';
+            blockBank.innerHTML = '';
+            
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.style.display = 'none';
+            feedback.className = 'feedback';
+            feedback.innerHTML = '';
+            
+            document.getElementById('btn-check').style.display = 'inline-flex';
+            document.getElementById('btn-show-answer').style.display = 'inline-flex';
+            document.getElementById('btn-next-q').style.display = 'none';
+
+            let shuffledBlocks = [...quiz.blocks].sort(() => Math.random() - 0.5);
+            shuffledBlocks.forEach((blockText, index) => {
+                const el = document.createElement('div');
+                el.className = `sql-block ${getBlockColorClass(blockText)}`;
+                el.innerText = blockText;
+                el.id = `block-${index}-${Date.now()}`;
+                
+                el.draggable = true;
+                el.addEventListener('dragstart', handleDragStart);
+                el.addEventListener('dragend', handleDragEnd);
+                el.onclick = () => moveBlockClick(el);
+                
+                blockBank.appendChild(el);
+            });
+            
+            setupDragAndDropZones();
+        }
+
+        function handleDragStart(e) {
+            if(questionAnswered) return e.preventDefault();
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        }
+
+        function setupDragAndDropZones() {
+            const zones = [document.getElementById('quiz-answer-zone'), document.getElementById('quiz-block-bank')];
+            zones.forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    if(!questionAnswered) zone.classList.add('drag-over');
+                });
+                zone.addEventListener('dragleave', e => {
+                    zone.classList.remove('drag-over');
+                });
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const id = e.dataTransfer.getData('text/plain');
+                    const el = document.getElementById(id);
+                    if(el && !questionAnswered) {
+                        zone.appendChild(el);
+                    }
+                });
+            });
+        }
+
+        function moveBlockClick(el) {
+            if(questionAnswered) return;
+            const dropZone = document.getElementById('quiz-answer-zone');
+            const blockBank = document.getElementById('quiz-block-bank');
+            
+            if(el.parentElement === blockBank) {
+                dropZone.appendChild(el);
+            } else {
+                blockBank.appendChild(el);
+            }
+        }
+
+        function checkAnswer() {
+            if(questionAnswered) return;
+            const blocks = document.getElementById('quiz-answer-zone').querySelectorAll('.sql-block');
+            
+            let userString = Array.from(blocks).map(b => b.innerText).join(" ").replace(/\s+/g, ' ').trim();
+            const quizData = lessonsData[currentLesson].quiz[currentQuizIndex];
+            const correctAnswer = quizData.ans.replace(/\s+/g, ' ').trim();
+            
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.style.display = 'block';
+            
+            if(userString === correctAnswer) {
+                feedback.className = 'feedback success';
+                feedback.innerHTML = `
+                    <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i> Correto! Bela consulta!<br><br>
+                    <div class="result-table-container">
+                        <h4><i class="fas fa-table"></i> Resultado real desta consulta no Banco de Dados:</h4>
+                        <table class="result-table">${quizData.res}</table>
+                    </div>`;
+                
+                stats.correct++;
+                quizHistory.push({ q: quizData.q, correct: true });
+                finalizeQuestion();
+            } else if (userString.length === 0) {
+                 feedback.className = 'feedback error shake-animation';
+                 feedback.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Ops! Arraste os blocos para a área de resposta primeiro antes de executar.';
+                 setTimeout(() => feedback.classList.remove('shake-animation'), 400);
+            } else {
+                 feedback.className = 'feedback error shake-animation';
+                 feedback.innerHTML = '<i class="fas fa-times-circle"></i> Incorreto! Verifique a ordem dos comandos, ou se você não pegou nenhum bloco falso e tente novamente.';
+                 setTimeout(() => feedback.classList.remove('shake-animation'), 400);
+            }
+        }
+
+        function showAnswer() {
+            if(questionAnswered) return;
+            const quizData = lessonsData[currentLesson].quiz[currentQuizIndex];
+            const feedback = document.getElementById('quiz-feedback');
+            
+            feedback.style.display = 'block';
+            feedback.className = 'feedback info';
+            
+            feedback.innerHTML = `
+                <i class="fas fa-lightbulb" style="font-size: 1.5rem;"></i> <b>Aqui está a resposta correta:</b><br>
+                <pre style="margin: 15px 0; font-size:1.1rem; border-left: 4px solid var(--primary);">${quizData.ans}</pre>
+                <div class="result-table-container">
+                    <h4><i class="fas fa-table"></i> Resultado real desta consulta no Banco de Dados:</h4>
+                    <table class="result-table">${quizData.res}</table>
+                </div>`;
+            
+            stats.wrong++;
+            quizHistory.push({ q: quizData.q, correct: false });
+            finalizeQuestion();
+        }
+
+        function finalizeQuestion() {
+            questionAnswered = true;
+            document.getElementById('btn-check').style.display = 'none';
+            document.getElementById('btn-show-answer').style.display = 'none';
+            document.getElementById('btn-next-q').style.display = 'inline-flex';
+            
+            document.querySelectorAll('.sql-block').forEach(b => {
+                b.draggable = false;
+                b.style.cursor = 'default';
+            });
+        }
+
+        function nextQuestion() {
+            currentQuizIndex++;
+            if(currentQuizIndex < 5) loadQuizQuestion();
+            else showFinalStats();
+        }
+
+        function showFinalStats() {
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('quiz-stats').style.display = 'block';
+            
+            document.getElementById('stat-acertos').innerText = stats.correct;
+            document.getElementById('stat-erros').innerText = stats.wrong;
+            
+            const summaryContainer = document.getElementById('summary-list-container');
+            summaryContainer.innerHTML = '<h3><i class="fas fa-history"></i> Seu Histórico:</h3><br>';
+            
+            quizHistory.forEach((item, index) => {
+                const statusIcon = item.correct ? '<i class="fas fa-check" style="color: var(--success);"></i> Acertou' : '<i class="fas fa-eye" style="color: var(--danger);"></i> Revelou Resposta';
+                const statusClass = item.correct ? "right" : "wrong";
+                
+                summaryContainer.innerHTML += `
+                    <div class="summary-item ${statusClass}">
+                        <div style="flex: 1;"><strong>Q${index + 1}:</strong> ${item.q}</div>
+                        <div style="font-size: 1rem; font-weight: bold; padding: 5px 10px; background: rgba(0,0,0,0.4); border-radius: 8px;">${statusIcon}</div>
+                    </div>
+                `;
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const lessonScreen = document.getElementById('lesson-screen');
+            const dbModal = document.getElementById('db-modal');
+            
+            if (lessonScreen.classList.contains('active') && dbModal.style.display !== 'flex') {
+                const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+                const activeIndex = tabs.findIndex(tab => tab.classList.contains('active'));
+                if (e.key === 'ArrowRight' && activeIndex < tabs.length - 1) tabs[activeIndex + 1].click();
+                else if (e.key === 'ArrowLeft' && activeIndex > 0) tabs[activeIndex - 1].click();
+            } else if (document.getElementById('intro-screen').classList.contains('active')) {
+                if (e.key === 'ArrowRight') showScreen('menu-screen');
+            } else if (document.getElementById('menu-screen').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') showScreen('intro-screen');
+            }
+        });
+    </script>
+</body>
+</html>
