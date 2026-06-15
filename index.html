@@ -477,20 +477,16 @@ LIMIT 5;</pre>
                     <p>E se você quiser ver <b>apenas as turmas que têm mais de 3 alunos</b>? É aqui que entra o <strong>HAVING</strong>.</p>
                     <p>O HAVING é o "WHERE" dos grupos. Ele atua como um inspetor que olha para as pilhas que o GROUP BY acabou de criar e descarta as pilhas inteiras que não atendem à sua condição.</p>
 
-                    <div class='highlight-box warning'>
-                        <h4><i class='fas fa-exclamation-triangle'></i> A Grande Diferença: WHERE vs HAVING</h4>
-                        <ul>
-                            <li><b>WHERE:</b> Filtra as fichas individuais <b>ANTES</b> de você começar a empilhar. (Ex: "Pegue apenas fichas de alunos da cidade de Picuí"). O WHERE não entende funções como <code>COUNT()</code>.</li>
-                            <li><b>HAVING:</b> Filtra as pilhas <b>DEPOIS</b> que elas estão prontas. (Ex: "Mostre apenas as pilhas que tenham <code>COUNT(IDAluno) > 3</code>"). Para filtrar agregações, você obrigatoriamente usa o HAVING.</li>
-                        </ul>
-                    </div>
                 `,
                 sintaxe: `
                     <h3><i class='fas fa-terminal'></i> Sintaxe Básica:</h3>
                     <pre>SELECT coluna, COUNT(id) \nFROM tabela \nGROUP BY coluna \nHAVING COUNT(id) > 10;</pre>
                     <div class='highlight-box warning'>
-                        <h4><i class='fas fa-filter'></i> Diferença: WHERE vs HAVING</h4>
-                        <p>O <code>WHERE</code> filtra dados <b>ANTES</b> de empilhar. O <code>HAVING</code> filtra <b>DEPOIS</b> que as pilhas estão prontas. Como o <code>WHERE</code> não entende a função <code>COUNT()</code>, para filtrar as pilhas você obrigatoriamente usa <code>HAVING</code>.</p>
+                        <h4><i class='fas fa-exclamation-triangle'></i> A diferença: WHERE vs HAVING</h4>
+                        <ul>
+                            <li><b>WHERE:</b> Filtra as fichas individuais <b>ANTES</b> de você começar a empilhar. (Ex: "Pegue apenas fichas de alunos da cidade de Picuí"). O WHERE não entende funções como <code>COUNT()</code>.</li>
+                            <li><b>HAVING:</b> Filtra as pilhas <b>DEPOIS</b> que elas estão prontas. (Ex: "Mostre apenas as pilhas que tenham <code>COUNT(IDAluno) > 3</code>"). Para filtrar agregações, você obrigatoriamente usa o HAVING.</li>
+                        </ul>
                     </div>
                 `,
                 exemplos: `
