@@ -571,6 +571,14 @@ LIMIT 5;</pre>
                 explicacao: `
                     <h3><i class='fas fa-user-shield'></i> O Segurança da Balada (EXISTS)</h3>
                     <p>O operador <strong>EXISTS</strong> responde "Sim ou Não". Ele olha uma linha da tabela principal, procura na tabela da subconsulta e, se achar <b>uma única correspondência</b>, ele aprova e exibe a linha principal.</p>
+                    <div class='highlight-box info'>
+                        <h4><i class='fas fa-exchange-alt'></i> Diferença: EXISTS vs ANY</h4>
+                        <p>É muito comum confundir os dois! A regra é simples:</p>
+                        <ul>
+                            <li>Use o <b>EXISTS</b> quando você só quer saber se <b>existe alguma relação</b> (Ex: "Esse aluno tem ALGUM empréstimo?"). Ele não compara valores matematicamente, só testa se a subconsulta retornou uma linha (Verdadeiro ou Falso).</li>
+                            <li>Use o <b>ANY</b> quando você precisa <b>comparar um valor específico</b> com uma lista (Ex: "O preço é MAIOR que ANY valor desta lista?").</li>
+                        </ul>
+                    </div>
                 `,
                 sintaxe: `
                     <h3><i class='fas fa-terminal'></i> Sintaxe Básica:</h3>
@@ -610,6 +618,19 @@ LIMIT 5;</pre>
                     <h3><i class='fas fa-random'></i> Qualquer um da Lista</h3>
                     <p>No SQL, geralmente comparamos um valor com outro único (ex: <code>idade = 18</code>). Mas com o <strong>ANY</strong>, você pode comparar um valor principal com uma matriz inteira gerada por uma subconsulta.</p>
                     <p>Se a condição bater como verdadeira para <b>QUALQUER UM</b> dos itens retornados no balde, a linha é aprovada.</p>
+                    <div class='highlight-box info'>
+                        <h4><i class='fas fa-exchange-alt'></i> Diferença: ANY vs EXISTS</h4>
+                        <p>Apesar de parecidos, eles têm missões diferentes:</p>
+                        <ul>
+                            <li>O <b>ANY</b> exige uma <b>comparação matemática ou lógica</b> (<code>=, >, <, >=</code>). Ele pega um valor (Ex: Idade) e testa ativamente contra vários outros de uma lista.</li>
+                            <li>O <b>EXISTS</b> é apenas um teste de <b>"Verdadeiro ou Falso"</b> (Vazio ou Cheio). Ele não liga para os valores do cesto, apenas se a subconsulta conseguiu achar pelo menos uma linha de relacionamento.</li>
+                        </ul>
+                    </div>
+
+                    <div class='highlight-box warning'>
+                        <h4><i class='fas fa-balance-scale'></i> Diferença entre ANY e IN</h4>
+                        <p>O operador <code>IN</code> verifica apenas se o valor é <b>exatamente IGUAL</b> a algum da lista. A força do <code>ANY</code> é trabalhar de forma elástica com sinais lógicos matemáticos (Ex: <code>> ANY</code>, <code>< ANY</code> ou <code>!= ANY</code>).</p>
+                    </div>
                 `,
                 sintaxe: `
                     <h3><i class='fas fa-terminal'></i> Sintaxe Básica:</h3>
