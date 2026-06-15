@@ -427,7 +427,7 @@ SELECT * FROM Alunos LIMIT 3;</pre>
                     <h3 style="margin-top:2rem;"><i class='fas fa-sort-numeric-down'></i> Exemplo 2: Ranking</h3>
                     <p>Ver os 5 livros mais antigos (usando ordenação):</p>
                     <pre>-- Como seria com TOP (SQL Server):
-SELECT TOP 5 * Titulo, AnoPublicacao FROM Livros 
+SELECT TOP 5 Titulo, AnoPublicacao FROM Livros 
 ORDER BY AnoPublicacao ASC;
 
 -- Como seria com LIMIT (MySQL):
