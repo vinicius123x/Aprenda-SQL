@@ -468,9 +468,22 @@ LIMIT 5;</pre>
             },
             groupby: {
                 title: "GROUP BY e HAVING",
-                explicacao: `
-                    <h3><i class='fas fa-object-group'></i> O Poder dos Agrupamentos</h3>
-                    <p>O <strong>GROUP BY</strong> transforma uma lista gigante em um resumo. Você junta as fichas repetidas em "pilhas" separadas: pilha de 'Picuí', 'Cuité', etc. O GROUP BY agrupa as linhas, permitindo que você use funções como <code>COUNT</code> ou <code>SUM</code> para contar e somar cada pilha independentemente.</p>
+                    explicacao: `
+                    <h3><i class='fas fa-object-group'></i> O Poder dos Agrupamentos (GROUP BY)</h3>
+                    <p>O <strong>GROUP BY</strong> transforma uma lista gigante em um resumo. Imagine que você tem 1.000 fichas de alunos espalhadas e precisa saber: <i>"Quantos alunos temos por Turma?"</i>.</p>
+                    <p>Você junta as fichas em "pilhas" separadas: a pilha da turma '1A', '1B', etc. O GROUP BY agrupa as linhas iguais, permitindo que você use funções matemáticas (como <code>COUNT</code>) para contar as fichas de cada pilha individualmente.</p>
+
+                    <h3 style="margin-top: 1.5rem;"><i class='fas fa-filter'></i> O Filtro dos Grupos (HAVING)</h3>
+                    <p>E se você quiser ver <b>apenas as turmas que têm mais de 3 alunos</b>? É aqui que entra o <strong>HAVING</strong>.</p>
+                    <p>O HAVING é o "WHERE" dos grupos. Ele atua como um inspetor que olha para as pilhas que o GROUP BY acabou de criar e descarta as pilhas inteiras que não atendem à sua condição.</p>
+
+                    <div class='highlight-box warning'>
+                        <h4><i class='fas fa-exclamation-triangle'></i> A Grande Diferença: WHERE vs HAVING</h4>
+                        <ul>
+                            <li><b>WHERE:</b> Filtra as fichas individuais <b>ANTES</b> de você começar a empilhar. (Ex: "Pegue apenas fichas de alunos da cidade de Picuí"). O WHERE não entende funções como <code>COUNT()</code>.</li>
+                            <li><b>HAVING:</b> Filtra as pilhas <b>DEPOIS</b> que elas estão prontas. (Ex: "Mostre apenas as pilhas que tenham <code>COUNT(IDAluno) > 3</code>"). Para filtrar agregações, você obrigatoriamente usa o HAVING.</li>
+                        </ul>
+                    </div>
                 `,
                 sintaxe: `
                     <h3><i class='fas fa-terminal'></i> Sintaxe Básica:</h3>
